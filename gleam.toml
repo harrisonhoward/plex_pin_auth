@@ -9,6 +9,8 @@ repository = { type = "github", user = "harrisonhoward", repo = "plex_pin_auth" 
 
 [dependencies]
 gleam_stdlib = "~> 0.36"
+gleam_http = ">= 3.6.0 and < 4.0.0"
+gleam_hackney = ">= 1.2.0 and < 2.0.0"
 
 [dev-dependencies]
 gleeunit = "~> 1.0"
