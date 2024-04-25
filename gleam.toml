@@ -1,0 +1,14 @@
+name = "plex_pin_auth"
+version = "1.0.0"
+gleam = ">= 1.1.0"
+target = "erlang"
+
+description = "Authenticate with Plex via the Plex pin authentication method"
+licences = ["MIT"]
+repository = { type = "github", user = "harrisonhoward", repo = "plex_pin_auth" }
+
+[dependencies]
+gleam_stdlib = "~> 0.36"
+
+[dev-dependencies]
+gleeunit = "~> 1.0"
