@@ -23,7 +23,7 @@ fn handle_response(
 pub fn create_pin(
   client_id client_identifier: String,
 ) -> Result(PlexPin, PlexError) {
-  fetch(client_identifier, "https://plex.tv/api/v2/pins", Post)
+  fetch(client_identifier, "/api/v2/pins", Post)
   |> handle_response
 }
 
@@ -34,10 +34,6 @@ pub fn get_token(
   client_id client_identifier: String,
   id pin_id: Int,
 ) -> Result(PlexPin, PlexError) {
-  fetch(
-    client_identifier,
-    "https://plex.tv/api/v2/pins/" <> int.to_string(pin_id),
-    Get,
-  )
+  fetch(client_identifier, "/api/v2/pins/" <> int.to_string(pin_id), Get)
   |> handle_response
 }
