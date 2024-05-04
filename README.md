@@ -2,7 +2,10 @@
 
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
 [![Made with Gleam](https://img.shields.io/badge/Made%20with-Gleam-ffaff3.svg)](https://shields.io/)
-[![Status](https://img.shields.io/badge/Status-Work%20in%20progress-yellow.svg)](https://shields.io/)
+[![Status](https://img.shields.io/badge/Status-Completed-green.svg)](https://shields.io/)
+
+[![Package Version](https://img.shields.io/hexpm/v/plex_pin_auth)](https://hex.pm/packages/plex_pin_auth)
+[![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/plex_pin_auth/)
 
 ## Scope
 
@@ -10,22 +13,39 @@ This project is linked to the project [plex_discord_rpc](https://github.com/harr
 
 Specifically I created this to allow the user to authenticate themselves easily within the `plex_discord_rpc` tool, doing so allows the tool to connect to their Plex Media Server to connect to the WebSocket.
 
-### Plex Pin Auth Documentation
+## Usage
+
+The method in which you handle getting a token is entirely left on the Developer. This an example of how you would create a pin and get the token.
+
+Feel free to use a package like [repeatedly](https://hexdocs.pm/repeatedly/) to handle the polling of the token.
+
+```gleam
+import plex_pin_auth
+import gleam/io
+
+const my_client_id = "YOUR_CLIENT_ID"
+
+pub fn main() {
+    // Creates the Plex pin
+    let assert Ok(pin) = plex_pin_auth.create_pin(client_id: my_client_id)
+    io.println("ID: " <> pin.id)
+    io.println("Pin: " <> pin.code)
+
+    // ... waiting for token
+
+    // Gets the token
+    let assert Ok(pin) = plex_pin_auth.get_token(my_client_id, pin.id)
+    let assert Some(token) = pin.auth_token
+    io.println("Token: " <> token)
+}
+```
+
+## Plex Pin Auth Documentation
 
 It appears the API isn't officially documented however I found some third-party documentation website. This website will be used in the creation of the pin authentication.
 
--   [get-pin](https://plexapi.dev/docs/plex/get-pin)
--   [get-token](https://plexapi.dev/docs/plex/get-token)
-
-## Development
-
-Requires Gleam to be installed to run the project\
-[How to install Gleam](https://gleam.run/getting-started/installing/)
-
-```sh
-# Runs the project
-gleam run
-```
+- [get-pin](https://plexapi.dev/docs/plex/get-pin)
+- [get-token](https://plexapi.dev/docs/plex/get-token)
 
 ## Contributing
 

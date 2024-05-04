@@ -6,6 +6,11 @@ target = "erlang"
 description = "Authenticate with Plex via the Plex pin authentication method"
 licences = ["MIT"]
 repository = { type = "github", user = "harrisonhoward", repo = "plex_pin_auth" }
+links = [
+    { title = "Related Project", href = "https://github.com/harrisonhoward/plex_discord_rpc" },
+]
+
+internal_modules = ["plex_pin_auth/internal", "plex_pin_auth/internal/*"]
 
 [dependencies]
 gleam_stdlib = "~> 0.36"

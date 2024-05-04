@@ -3,8 +3,8 @@ import gleam/int
 import gleam/option.{Some}
 import gleeunit
 import gleeunit/should
-import util/parser.{type PlexError, type PlexPin}
-import util/request.{type FetchError, fetch}
+import plex_pin_auth/internal/request.{type FetchError, fetch}
+import plex_pin_auth/util/parser.{type PlexError, type PlexPin}
 
 const unique_id = "plex_pin_auth_test"
 

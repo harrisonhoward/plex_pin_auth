@@ -4,7 +4,7 @@ import gleam/dynamic
 import gleam/json
 import gleam/list
 import gleam/option.{type Option}
-import util/decode
+import plex_pin_auth/internal/decode
 
 /// Represents a single plex error that would be returned from the API
 pub type PlexError {
