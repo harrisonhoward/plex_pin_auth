@@ -1,9 +1,9 @@
-import gleam/dynamic
 import gleam/http.{Get, Post}
 import gleam/int
+import gleam/option.{Some}
 import gleeunit
 import gleeunit/should
-import util/parser
+import util/parser.{type PlexError, type PlexPin}
 import util/request.{type FetchError, fetch}
 
 const unique_id = "plex_pin_auth_test"
@@ -67,7 +67,7 @@ pub fn decode_pin_test() {
   pin_obj.location.time_zone
   |> should.equal("timezone")
   pin_obj.location.postal_code
-  |> should.equal("postalCode")
+  |> should.equal(Some("postalCode"))
   pin_obj.location.in_privacy_restricted_country
   |> should.equal(False)
   pin_obj.location.coordinates
@@ -84,100 +84,56 @@ pub fn decode_pin_test() {
   |> should.be_none
 }
 
-pub fn get_pin_error_test() {
+pub fn request_test() {
+  // Pin throws error
   fetch("", "/api/v2/pins", Post)
   |> is_plex_error
-}
 
-pub fn get_pin_success_test() {
-  fetch(unique_id, "/api/v2/pins", Post)
-  |> is_plex_pin
-}
+  // Pin is successful
+  let pin =
+    fetch(unique_id, "/api/v2/pins", Post)
+    |> is_plex_pin
 
-pub fn get_token_error_test() {
-  // We need to get an actual pin object to test this
-  let assert Ok(pin_response) = fetch(unique_id, "/api/v2/pins", Post)
-  let assert Ok(pin) = parser.decode_pin_json(pin_response)
-
+  // Token throws error
   fetch("", "/api/v2/pins/" <> int.to_string(pin.id), Get)
   |> is_plex_error
-}
 
-pub fn get_token_success_test() {
-  // We need to get an actual pin object to test this
-  let assert Ok(pin_response) = fetch(unique_id, "/api/v2/pins", Post)
-  let assert Ok(pin) = parser.decode_pin_json(pin_response)
-
+  // Token is successful
   fetch(unique_id, "/api/v2/pins/" <> int.to_string(pin.id), Get)
   |> is_plex_pin
 }
 
-fn is_plex_error(error_response: Result(String, FetchError)) {
+fn is_plex_error(error_response: Result(String, FetchError)) -> PlexError {
   // Should error
-  error_response
-  |> should.be_error
-  let assert Error(response_err) = error_response
+  let response_err =
+    error_response
+    |> should.be_error
 
   // Convert JSON string into error object
-  let assert Ok(error) = parser.decode_error_json(response_err.message)
+  let error =
+    parser.decode_error_json(response_err.message)
+    |> should.be_ok
 
   // Message should be about missing the client identifier
   error.message
   |> should.equal("X-Plex-Client-Identifier is missing")
+  error
 }
 
-fn is_plex_pin(success_response: Result(String, FetchError)) {
+fn is_plex_pin(success_response: Result(String, FetchError)) -> PlexPin {
   // Should not error
-  success_response
-  |> should.be_ok
-  let assert Ok(response) = success_response
+  let response =
+    success_response
+    |> should.be_ok
 
   // Convert JSON string into pin object
-  let assert Ok(pin) = parser.decode_pin_json(response)
+  let pin =
+    parser.decode_pin_json(response)
+    |> should.be_ok
 
   // Make sure the client identifier is correct
   pin.client_identifier
   |> should.equal(unique_id)
 
-  // Now check that each type is correct
-  dynamic.int(dynamic.from(pin.id))
-  |> should.be_ok
-  dynamic.string(dynamic.from(pin.code))
-  |> should.be_ok
-  dynamic.string(dynamic.from(pin.product))
-  |> should.be_ok
-  dynamic.bool(dynamic.from(pin.trusted))
-  |> should.be_ok
-  dynamic.string(dynamic.from(pin.qr))
-  |> should.be_ok
-  dynamic.string(dynamic.from(pin.client_identifier))
-  |> should.be_ok
-  dynamic.string(dynamic.from(pin.location.code))
-  |> should.be_ok
-  dynamic.bool(dynamic.from(pin.location.european_union_member))
-  |> should.be_ok
-  dynamic.string(dynamic.from(pin.location.continent_code))
-  |> should.be_ok
-  dynamic.string(dynamic.from(pin.location.country))
-  |> should.be_ok
-  dynamic.string(dynamic.from(pin.location.city))
-  |> should.be_ok
-  dynamic.string(dynamic.from(pin.location.time_zone))
-  |> should.be_ok
-  dynamic.string(dynamic.from(pin.location.postal_code))
-  |> should.be_ok
-  dynamic.bool(dynamic.from(pin.location.in_privacy_restricted_country))
-  |> should.be_ok
-  dynamic.string(dynamic.from(pin.location.coordinates))
-  |> should.be_ok
-  dynamic.int(dynamic.from(pin.expires_in))
-  |> should.be_ok
-  dynamic.string(dynamic.from(pin.created_at))
-  |> should.be_ok
-  dynamic.string(dynamic.from(pin.expires_at))
-  |> should.be_ok
-  pin.auth_token
-  |> should.be_none
-  pin.new_registration
-  |> should.be_none
+  pin
 }
